@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>canvas_test</title>
+    <link rel="stylesheet" href="">
+
+    <style>
+        *{padding: 0; margin: 0; background-color:white }
+        .circle{width: 38px;height: 38px;position: relative; background-color:black; border-radius:38px;}
+        canvas{display: block;margin: 0;position: absolute;background: white;left: 0;top: 0;}
+        #canvas_1{z-index: 1 ;background: transparent;}
+        #canvas_2{z-index: 2; background: transparent;transform:rotate(-90deg); }
+        .circle_bg,.circle_motion{position:absolute; top:3px; left:3px;}
+
+    </style>
+
+</head>
+<body>
+<div class="circle">
+    <canvas id="canvas_1" class="circle_bg" width="32" height="32"></canvas>
+    <canvas id="canvas_2" class="circle_motion" width="32" height="32"></canvas>
+</div>
+<script>
+    function inte(percent) {
+        var canvas_1 = document.querySelector('#canvas_1');
+        var canvas_2 = document.querySelector('#canvas_2');
+        var ctx_1 = canvas_1.getContext('2d');
+        var ctx_2 = canvas_2.getContext('2d');
+        ctx_1.lineWidth = 3;
+        ctx_1.strokeStyle = "#ccc";
+        //画底部的灰色圆环
+        ctx_1.beginPath();
+        ctx_1.arc(canvas_1.width / 2, canvas_1.height / 2, canvas_1.width / 2 - ctx_1.lineWidth / 2, 0, Math.PI * 2, false);
+        ctx_1.closePath();
+        ctx_1.stroke();
+        ctx_1.font = '4px Arial';
+        ctx_1.fillStyle = 'white';
+        ctx_1.fillText('%',22, 14);
+        if (percent < 0 || percent > 100) {
+            throw new Error('percent must be between 0 and 100');
+            return
+        }
+        ctx_2.lineWidth = 3;
+        ctx_2.strokeStyle = "#00d573";
+        var angle = 0;
+        var timer;
+        (function draw() {
+            timer = requestAnimationFrame(draw);
+            ctx_2.clearRect(0, 0, canvas_2.width, canvas_2.height)
+            //百分比圆环
+            ctx_2.beginPath();
+            ctx_2.arc(canvas_2.width / 2, canvas_2.height / 2, canvas_2.width / 2 - ctx_2.lineWidth / 2, 0, angle * Math.PI / 180, false);
+            angle+=3;
+            var percentAge = parseInt((angle / 360) * 100)
+            if (angle > (percent / 100 * 360)) {
+                percentAge = percent
+                window.cancelAnimationFrame(timer);
+            };
+            ctx_2.stroke();
+            ctx_2.closePath();
+            ctx_2.save();
+            ctx_2.beginPath();
+            ctx_2.rotate(90 * Math.PI / 180)
+            ctx_2.font = '12px Arial';
+            ctx_2.fillStyle = 'white';
+            var text = percentAge;
+            ctx_2.fillText(text, 8, -10);
+            ctx_2.closePath();
+            ctx_2.restore();
+        })()
+    }
+    window.onload = inte(75);
+</script>
+</body>
+</html>
